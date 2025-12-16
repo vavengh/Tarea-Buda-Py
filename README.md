@@ -48,3 +48,8 @@ pip install -r requirements.txt
 ```bash
 uvicorn app.main:app --reload
 ```
+
+## Endpoints:
+
+Endpoint de verificación: (fase temporal para debug)
+    -GET /buda/tickers
