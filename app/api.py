@@ -8,32 +8,53 @@ from app.models import PortfolioRequest, PortfolioValueResponse
 
 from app.buda_client import BudaPublicClient, BudaUpstreamError
 
+from app.pricing import build_graph, find_rate_max_2_hops
+
 
 router = APIRouter()
 
 
 @router.post("/portfolio/value", response_model=PortfolioValueResponse)
 def value_portfolio(payload: PortfolioRequest) -> PortfolioValueResponse:
-    """
-    Paso 2 (placeholder):
-    - Devolvemos 0 en todas las valorizaciones.
-    - La integración con precios de Buda viene en el Paso 3/4.
-    """
-    breakdown = {symbol: Decimal("0") for symbol in payload.portfolio.keys()}
-    total = sum(breakdown.values(), start=Decimal("0"))
+    client = BudaPublicClient()
+
+    try:
+        tickers = client.get_tickers()
+    except BudaUpstreamError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    graph = build_graph(tickers)
+    fiat = payload.fiat_currency.upper()
+
+    breakdown: dict[str, Decimal] = {}
+    unpriced: list[str] = []
+    total = Decimal("0")
+
+    for symbol, amount in payload.portfolio.items():
+        sym = symbol.upper()
+
+        rate = find_rate_max_2_hops(graph, sym, fiat)
+        if rate is None:
+            unpriced.append(sym)
+            continue
+
+        value = Decimal(amount) * rate
+        breakdown[sym] = value
+        total += value
 
     return PortfolioValueResponse(
         fiat_currency=payload.fiat_currency,
         total=total,
         breakdown=breakdown,
-        unpriced=[],
+        unpriced=unpriced,
     )
+
 
 @router.get("/buda/tickers")
 def buda_tickers():
     """
     Endpoint de apoyo: permite verificar rápidamente que estamos consumiendo Buda.
-    (No es parte del enunciado final; si quieres lo eliminamos al final.)
+    Aqui puedo ver todas las conversiones y calcular a mano para comparar.
     """
     client = BudaPublicClient()
     try:
@@ -41,7 +62,6 @@ def buda_tickers():
     except BudaUpstreamError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
-    # Devuelve una muestra pequeña para no mandar miles de líneas
-    sample_keys = list(tickers.keys())[:10]
+    sample_keys = list(tickers.keys())
     sample = {k: {"last_price": str(tickers[k].last_price)} for k in sample_keys}
     return {"count": len(tickers), "sample": sample}
