@@ -61,7 +61,7 @@ POST /portfolio/value (endpoint principal)
 Calcula el valor de un portafolio de criptomonedas en una moneda fiat de referencia.
 
 Request body ejemplo (JSON)
-
+```bash
 {
   "portfolio": {
     "BTC": 0.5,
@@ -69,11 +69,13 @@ Request body ejemplo (JSON)
   },
   "fiat_currency": "CLP"
 }
+```
 
 portfolio: mapa de símbolo de criptomoneda a cantidad (no negativa)
 fiat_currency: moneda fiat de referencia (CLP, PEN o COP)
 
 Respuesta exitosa (200)
+```bash
 {
   "fiat_currency": "CLP",
   "total": "45400000",
@@ -83,6 +85,7 @@ Respuesta exitosa (200)
   },
   "unpriced": []
 }
+```
 
 total: valor total del portafolio en la moneda fiat
 breakdown: valorización individual por cripto
