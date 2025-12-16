@@ -60,7 +60,7 @@ POST /portfolio/value (endpoint principal)
 
 Calcula el valor de un portafolio de criptomonedas en una moneda fiat de referencia.
 
-Request body (JSON)
+Request body ejemplo (JSON)
 
 {
   "portfolio": {
