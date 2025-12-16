@@ -152,8 +152,8 @@ curl -X POST "http://127.0.0.1:8000/portfolio/value" \
 ```
 Respuesta esperada: 422 Unprocessable Entity
 
-## Tests automatizados
-Para ejecutar los tests automatizados, asegúrate de tener instalado `pytest` y luego corre:
+## Tests
+Para ejecutar los tests, asegúrate de tener instalado `pytest` y luego corre:
 
 ```bash
 source .venv/bin/activate
