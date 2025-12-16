@@ -31,15 +31,15 @@ def value_portfolio(payload: PortfolioRequest) -> PortfolioValueResponse:
     total = Decimal("0")
 
     for symbol, amount in payload.portfolio.items():
-        sym = symbol.upper()
+        currency_symbol = symbol.upper()
 
-        rate = find_rate_max_2_hops(graph, sym, fiat)
+        rate = find_rate_max_2_hops(graph, currency_symbol, fiat)
         if rate is None:
-            unpriced.append(sym)
+            unpriced.append(currency_symbol)
             continue
 
         value = Decimal(amount) * rate
-        breakdown[sym] = value
+        breakdown[currency_symbol] = value
         total += value
 
     return PortfolioValueResponse(

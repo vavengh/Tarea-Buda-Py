@@ -26,8 +26,8 @@ def build_graph(tickers: Dict[str, Ticker]) -> Graph:
     """
     graph: Graph = {}
 
-    def add_edge(frm: str, to: str, rate: Decimal) -> None:
-        graph.setdefault(frm, []).append(Edge(to=to, rate=rate))
+    def add_edge(currency1: str, currency2: str, rate: Decimal) -> None:
+        graph.setdefault(currency1, []).append(Edge(to=currency2, rate=rate))
 
     for t in tickers.values():
         if t.last_price <= 0:
@@ -43,7 +43,7 @@ def build_graph(tickers: Dict[str, Ticker]) -> Graph:
     return graph
 
 
-def find_rate_max_2_hops(graph: Graph, src: str, dst: str) -> Optional[Decimal]:
+def find_rate_max_2_hops(graph: Graph, currency1: str, currency2: str) -> Optional[Decimal]:
     """
     Retorna la tasa multiplicativa para convertir src -> dst.
     Busca rutas de máximo 2 saltos (src->dst o src->X->dst).
@@ -52,17 +52,17 @@ def find_rate_max_2_hops(graph: Graph, src: str, dst: str) -> Optional[Decimal]:
       - Decimal(rate) si existe ruta
       - None si no existe
     """
-    src = src.upper()
-    dst = dst.upper()
-    if src == dst:
+    currency1 = currency1.upper()
+    currency2 = currency2.upper()
+    if currency1 == currency2:
         return Decimal("1")
 
     # BFS con tracking de (node, rate_so_far, depth)
-    q = deque([(src, Decimal("1"), 0)])
-    visited: Set[Tuple[str, int]] = set([(src, 0)])
+    queue = deque([(currency1, Decimal("1"), 0)])
+    visited: Set[Tuple[str, int]] = set([(currency1, 0)])
 
-    while q:
-        node, rate, depth = q.popleft()
+    while queue:
+        node, rate, depth = queue.popleft()
         if depth >= 2:
             continue
 
@@ -71,12 +71,12 @@ def find_rate_max_2_hops(graph: Graph, src: str, dst: str) -> Optional[Decimal]:
             next_rate = rate * edge.rate
             next_depth = depth + 1
 
-            if next_node == dst:
+            if next_node == currency2:
                 return next_rate
 
             key = (next_node, next_depth)
             if key not in visited:
                 visited.add(key)
-                q.append((next_node, next_rate, next_depth))
+                queue.append((next_node, next_rate, next_depth))
 
     return None

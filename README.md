@@ -48,8 +48,85 @@ pip install -r requirements.txt
 ```bash
 uvicorn app.main:app --reload
 ```
+La API quedará disponible en:
+
+Health check: http://127.0.0.1:8000/health
+
+Documentación Swagger (OpenAPI): http://127.0.0.1:8000/docs
 
 ## Endpoints:
 
-Endpoint de verificación: (fase temporal para debug)
-    -GET /buda/tickers
+POST /portfolio/value (endpoint principal)
+
+Calcula el valor de un portafolio de criptomonedas en una moneda fiat de referencia.
+
+Request body (JSON)
+
+{
+  "portfolio": {
+    "BTC": 0.5,
+    "ETH": 2.0
+  },
+  "fiat_currency": "CLP"
+}
+
+portfolio: mapa de símbolo de criptomoneda a cantidad (no negativa)
+fiat_currency: moneda fiat de referencia (CLP, PEN o COP)
+
+Respuesta exitosa (200)
+{
+  "fiat_currency": "CLP",
+  "total": "45400000",
+  "breakdown": {
+    "BTC": "40000000",
+    "ETH": "5400000"
+  },
+  "unpriced": []
+}
+
+
+total: valor total del portafolio en la moneda fiat
+breakdown: valorización individual por cripto
+unpriced: criptos que no pudieron valorizarse
+
+## Ejemplos de uso manual (curl)
+
+Ejemplo válido – conversión directa:
+```bash
+curl -X POST "http://127.0.0.1:8000/portfolio/value" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "portfolio": {"BTC": 0.5},
+    "fiat_currency": "CLP"
+  }'
+```
+
+Ejemplo inválido – cantidad negativa:
+```bash
+curl -X POST "http://127.0.0.1:8000/portfolio/value" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "portfolio": {"BTC": -1},
+    "fiat_currency": "CLP"
+  }'
+```
+Respuesta esperada: 422 Unprocessable Entity
+
+Ejemplo inválido – moneda fiat no permitida
+```bash
+curl -X POST "http://127.0.0.1:8000/portfolio/value" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "portfolio": {"BTC": 1},
+    "fiat_currency": "USD"
+  }'
+```
+Respuesta esperada: 422 Unprocessable Entity
+
+## Tests automatizados
+Para ejecutar los tests automatizados, asegúrate de tener instalado `pytest` y luego corre:
+
+```bash
+source .venv/bin/activate
+pytest -q
+```
