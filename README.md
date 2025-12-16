@@ -153,9 +153,11 @@ curl -X POST "http://127.0.0.1:8000/portfolio/value" \
 Respuesta esperada: 422 Unprocessable Entity
 
 ## Tests
-Para ejecutar los tests, asegúrate de tener instalado `pytest` y luego corre:
+Para ejecutar los tests de manera manual, asegúrate de tener instalado `pytest` y luego corre:
 
 ```bash
 source .venv/bin/activate
 pytest -q
 ```
+
+De igual forma, estos se corren automaticamente mediante GithubActions en cada push o pull request.
