@@ -91,6 +91,10 @@ total: valor total del portafolio en la moneda fiat
 breakdown: valorización individual por cripto
 unpriced: criptos que no pudieron valorizarse
 
+## Deploy
+Fue realizado con render y se encuentra en el enlace:
+https://tarea-buda-py.onrender.com
+
 ## Supuestos para la valorización
 🔹 Máximo de dos saltos
 Si no existe un mercado directo, la API permite una conversión usando un intermediario, con un máximo de 2 saltos.
@@ -112,6 +116,9 @@ Si una criptomoneda no puede convertirse a la moneda fiat ni directa ni indirect
 - Se agrega su símbolo al arreglo unpriced
 
 ## Ejemplos de uso manual (curl)
+
+En la consola, con el servidor corriendo, puedes probar los siguientes ejemplos:
+(Si se quiere usar el servidor deployado debes reemplazar "https://tarea-buda-py.onrender.com" por http://127.0.0.1:8000)
 
 Ejemplo válido – conversión directa:
 ```bash
