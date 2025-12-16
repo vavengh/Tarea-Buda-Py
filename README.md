@@ -54,7 +54,7 @@ Health check: http://127.0.0.1:8000/health
 
 Documentación Swagger (OpenAPI): http://127.0.0.1:8000/docs
 
-## Endpoints:
+## Endpoint:
 
 POST /portfolio/value (endpoint principal)
 
@@ -84,10 +84,29 @@ Respuesta exitosa (200)
   "unpriced": []
 }
 
-
 total: valor total del portafolio en la moneda fiat
 breakdown: valorización individual por cripto
 unpriced: criptos que no pudieron valorizarse
+
+## Supuestos para la valorización
+🔹 Máximo de dos saltos
+Si no existe un mercado directo, la API permite una conversión usando un intermediario, con un máximo de 2 saltos.
+
+Por ejemplo:
+ETH → BTC → CLP
+En caso de que no sea posible ETH → CLP
+
+Se toma en cuenta este límite de 2 saltos por varias razones:
+- Mantiene la solución simple y eficiente.
+- Refleja un escenario realista de valorización (la idea tampoco es alejarse de una valoracion realista por exceso de saltos).
+- Evita rutas largas, ciclos y resultados poco fiables.
+- Facilita testeo y mantenimiento del código.
+- Es facilmente extensible en el futuro si se desea aumentar el límite.
+
+🔹Criptomonedas no valorizables
+Si una criptomoneda no puede convertirse a la moneda fiat ni directa ni indirectamente (hasta 2 saltos), entonces:
+- No se incluye en el cálculo del total
+- Se agrega su símbolo al arreglo unpriced
 
 ## Ejemplos de uso manual (curl)
 
